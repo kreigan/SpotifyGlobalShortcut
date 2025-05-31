@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "FakeSpotify": {
+      "commandName": "Project",
+      "commandLineArgs": "SpotifyGlobalShortcut.FakeSpotify"
+    },
+    "RealSpotify": {
+      "commandName": "Project"
+    }
+  }
+}
