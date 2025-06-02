@@ -3,6 +3,9 @@
 using Windows.Win32;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 
+using System.Runtime.CompilerServices;
+[assembly: InternalsVisibleTo("SpotifyGlobalShortcut.Tests")]
+
 namespace SpotifyGlobalShortcut.App.Input;
 
 public partial class InputManager
@@ -23,7 +26,7 @@ public partial class InputManager
         }
     }
 
-    private static ReadOnlySpan<INPUT> ShortcutToInput(KeyboardShortcut shortcut)
+    internal static ReadOnlySpan<INPUT> ShortcutToInput(KeyboardShortcut shortcut)
     {
         List<VirtualKey> keys = [.. shortcut.Keys];
         INPUT[] inputs = new INPUT[keys.Count * 2];
