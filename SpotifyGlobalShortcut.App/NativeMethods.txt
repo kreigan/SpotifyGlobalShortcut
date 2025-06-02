@@ -1,0 +1,13 @@
+GetMessageExtraInfo
+SendInput
+
+EnumThreadWindows
+GetClassNameW
+GetForegroundWindow
+GetWindow
+GetWindowLongPtrW
+GetWindowThreadProcessId
+IsIconic
+SetForegroundWindow
+ShowWindow
+WINDOW_EX_STYLE

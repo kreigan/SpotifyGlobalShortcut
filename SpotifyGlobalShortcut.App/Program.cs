@@ -1,32 +1,40 @@
-﻿using System.Diagnostics;
+﻿using System.Runtime.Versioning;
 
 using SpotifyGlobalShortcut.App.Input;
-using SpotifyGlobalShortcut.App.Window;
 
 namespace SpotifyGlobalShortcut.App;
 
+[SupportedOSPlatform("windows5.0")]
 internal partial class Program
 {
+    private const string SpotifyProcessName = "Spotify";
+    
     public static void Main(string[] args)
     {
-        nint originalWindow = WindowManager.ForegroundWindow;
+        string processName = args.Length > 0 ? args[0] : SpotifyProcessName;
+        SpotifyWindowManager manager = new(processName);
+        AppWindow? spotifyWindow = manager.GetSpotifyWindow()
+            ?? throw new InvalidOperationException($"Spotify window not found. Is {processName} running?");
 
-        string processName = args.Length > 0 ? args[0] : "Spotify";
-        Process[] processes = Process.GetProcessesByName(processName);
-        nint hwnd = (from proc in processes
-                     where proc.MainWindowHandle != nint.Zero
-                     select proc.MainWindowHandle).FirstOrDefault();
+        bool wasMinimized = spotifyWindow.Minimized;
+        if (wasMinimized)
+        {
+            spotifyWindow.Restore();
+        }
 
-        if (WindowManager.IsMinimized(hwnd))
-            WindowManager.RestoreWindow(hwnd);
-
-        WindowManager.ForegroundWindow = hwnd;
+        AppWindow? currentWindow = AppWindow.GetForeground();
+        spotifyWindow.ToForeground();
         Thread.Sleep(100);
 
         LikeDislike();
 
         Thread.Sleep(100);
-        WindowManager.ForegroundWindow = originalWindow;
+        if (wasMinimized)
+        {
+            spotifyWindow.Hide();
+        }
+
+        currentWindow?.ToForeground();
     }
 
     private static void LikeDislike()
@@ -36,8 +44,8 @@ internal partial class Program
             VirtualKey.SHIFT,
             VirtualKey._B
         );
-        
-        bool success = SendShortcut(likeDislike, out string errorMessage);
+
+        bool success = InputManager.SendShortcut(likeDislike, out string errorMessage);
         if (!success)
         {
             Console.WriteLine($"Failed to send shortcut: {errorMessage}");
